@@ -17,7 +17,7 @@ def lambda_handler(event, context):
     instanceids = []
     if os.getenv('instances') == 'backup':
         
-        reservations = client.describe_instances( Filters=[{ 'Name': 'tag-key', 'Values': ['backup',]},], DryRun=False).get('Reservations', [])
+        reservations = client.describe_instances( Filters=[{ 'Name': 'owner', 'Values': ['dev',]},], DryRun=False).get('Reservations', [])
         instances = sum([[i for i in r['Instances']]for r in reservations], [])
         for instance in instances:
             instanceids.append(instance['InstanceId'])
