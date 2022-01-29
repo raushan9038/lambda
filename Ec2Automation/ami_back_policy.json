@@ -16,6 +16,15 @@
             ]
         },
         {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+        },
+        {
             "Sid": "VisualEditor1",
             "Effect": "Allow",
             "Action": [
