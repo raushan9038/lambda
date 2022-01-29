@@ -1,6 +1,6 @@
 import boto3
 
-AWS_REGION = "us-east-2"
+AWS_REGION = "ap-south-1"
 EC2_RESOURCE = boto3.resource('ec2', region_name=AWS_REGION)
 EC2_INSTANCE_ID = 'i-0e9a442e6332682dc'
 
