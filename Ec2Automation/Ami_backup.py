@@ -1,31 +1,26 @@
-####################################################################################
-#   AWS Lambda function which creates Images for instances which has "backup" as 
-#   tag or instances mentioned in environment varibles
-#
-#
-####################################################################################
-import json
-import os
 import boto3
-import datetime
 
-start_date = str(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-region = os.getenv("region")
-client = boto3.client('ec2',region)
+AWS_REGION = "us-east-2"
+EC2_RESOURCE = boto3.resource('ec2', region_name=AWS_REGION)
+EC2_INSTANCE_ID = 'i-0e9a442e6332682dc'
 
-def lambda_handler(event, context):
-    instanceids = []
-    if os.getenv('instances') == 'backup':
-        
-        reservations = client.describe_instances( Filters=[{ 'Name': 'owner', 'Values': ['dev',]},], DryRun=False).get('Reservations', [])
-        instances = sum([[i for i in r['Instances']]for r in reservations], [])
-        for instance in instances:
-            instanceids.append(instance['InstanceId'])
-    else:
-        instanceids = json.loads(os.getenv("instances"))
-    #print(start_date)
-    for instanceid in instanceids:
-        name= "Lambda for "+instanceid+" from "+start_date
-        description= "AMI for "+instanceid+" created by lambda"
-        image = client.create_image(Description=description,DryRun=False, InstanceId=instanceid, Name=name, NoReboot=True)
-        print(image['ImageId'])
+instance = EC2_RESOURCE.Instance(EC2_INSTANCE_ID)
+
+image = instance.create_image(
+    Name='hands-on-cloud-demo-ami',
+    Description='This is demo AMI',
+    NoReboot=True
+)
+
+print(f'AMI creation started: {image.id}')
+
+image.wait_until_exists(
+    Filters=[
+        {
+            'Name': 'state',
+            'Values': ['available']
+        }
+    ]
+)
+
+print(f'AMI {image.id} successfully created')
